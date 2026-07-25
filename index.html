@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Below the Ocean - Scene 1: Ocean Surface</title>
+  
+  <!-- SEO & Meta -->
+  <meta name="description" content="An immersive 3D web experience exploring the ocean from surface to deep sea." />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@600;700&family=Cinzel:wght@400;600;700&family=Outfit:wght@200;300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- 3D Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Integrated Cinematic UI Overlay -->
+  <div id="ui-overlay" class="ui-overlay">
+    <!-- Header / Title section -->
+    <header class="title-container" id="title-container">
+      <div class="subtitle-badge">SCENE I &bull; THE SURFACE</div>
+      <h1 class="main-title">BELOW THE OCEAN</h1>
+      <p class="tagline">An interactive cinematic exploration of the deep blue</p>
+    </header>
+
+    <!-- Interactive Dive Button -->
+    <div class="action-container" id="action-container">
+      <button id="dive-btn" class="dive-button" aria-label="Dive into the ocean">
+        <span class="btn-border-glow"></span>
+        <span class="btn-ripple"></span>
+        <span class="btn-content">
+          <svg class="dive-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="btn-text">DIVE IN</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Submerged Depth Indicator (Shown during/after dive) -->
+    <div id="depth-hud" class="depth-hud hidden">
+      <div class="depth-gauge">
+        <span class="depth-label">DEPTH</span>
+        <span id="depth-value" class="depth-value">0</span>
+        <span class="depth-unit">METERS</span>
+      </div>
+      <div class="depth-bar">
+        <div id="depth-progress" class="depth-progress"></div>
+      </div>
+    </div>
+
+    <!-- Resurface Button (Shown when submerged) -->
+    <div id="resurface-container" class="resurface-container hidden">
+      <button id="resurface-btn" class="resurface-button" aria-label="Return to ocean surface">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 20V4m0 0l-6 6m6-6l6 6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>RETURN TO SURFACE</span>
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
