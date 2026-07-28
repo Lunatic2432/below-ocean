@@ -18,7 +18,8 @@ export class UIManager {
 
   initEvents() {
     if (this.diveBtn) {
-      this.diveBtn.addEventListener('click', () => {
+      this.diveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (typeof this.onDiveClickCallback === 'function') {
           this.onDiveClickCallback();
         }
@@ -26,7 +27,8 @@ export class UIManager {
     }
 
     if (this.resurfaceBtn) {
-      this.resurfaceBtn.addEventListener('click', () => {
+      this.resurfaceBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (typeof this.onResurfaceClickCallback === 'function') {
           this.onResurfaceClickCallback();
         }

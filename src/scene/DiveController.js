@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 
 export class DiveController {
-  constructor(sceneManager, skyEnv, oceanSurface, underwaterEnv, bubbleSystem, uiManager) {
+  constructor(sceneManager, skyEnv, oceanSurface, underwaterEnv, bubbleSystem, uiManager, scene2 = null) {
     this.sceneManager = sceneManager;
     this.skyEnv = skyEnv;
     this.oceanSurface = oceanSurface;
     this.underwaterEnv = underwaterEnv;
     this.bubbleSystem = bubbleSystem;
     this.uiManager = uiManager;
+    this.scene2 = scene2;
 
     // States: 'SURFACE', 'DIVING', 'SUBMERGED', 'RESURFACING'
     this.state = 'SURFACE';
@@ -20,7 +21,7 @@ export class DiveController {
 
     // Camera Deep Base
     this.deepCamPos = new THREE.Vector3(0, -18, 12);
-    this.deepLookAt = new THREE.Vector3(0, -22, 6);
+    this.deepLookAt = new THREE.Vector3(0, -18, 0);
 
     this.currentLookAt = this.surfaceLookAt.clone();
   }
@@ -56,8 +57,12 @@ export class DiveController {
       },
       onComplete: () => {
         this.state = 'SUBMERGED';
-        this.sceneManager.floatEnabled = true; // Re-enable gentle submerged swaying
         this.uiManager.onCompleteDive();
+
+        // Activate Scene 2 User Exploration Controls
+        if (this.scene2 && typeof this.scene2.activate === 'function') {
+          this.scene2.activate();
+        }
       }
     });
 
@@ -92,6 +97,11 @@ export class DiveController {
 
     this.state = 'RESURFACING';
     this.uiManager.onStartResurface();
+
+    // Deactivate Scene 2 User Exploration Controls
+    if (this.scene2 && typeof this.scene2.deactivate === 'function') {
+      this.scene2.deactivate();
+    }
 
     const camera = this.sceneManager.camera;
     const duration = 4.5;
@@ -162,3 +172,4 @@ export class DiveController {
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
+

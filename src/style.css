@@ -176,19 +176,21 @@ html, body {
 /* Submerged Depth HUD */
 .depth-hud {
   position: fixed;
-  bottom: 2.5rem;
-  left: 3rem;
+  top: 2rem;
+  left: 2rem;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  background: rgba(4, 15, 30, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(100, 200, 255, 0.2);
-  border-radius: 12px;
+  background: rgba(4, 15, 30, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(100, 220, 255, 0.3);
+  border-radius: 14px;
   padding: 0.8rem 1.4rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   transition: opacity 0.8s ease, transform 0.8s ease;
+  z-index: 20;
 }
 
 .depth-gauge {
@@ -220,8 +222,8 @@ html, body {
 
 .depth-bar {
   width: 100%;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -237,43 +239,46 @@ html, body {
 .resurface-container {
   position: fixed;
   bottom: 2.5rem;
-  right: 3rem;
+  right: 2.5rem;
   pointer-events: auto;
   transition: opacity 0.8s ease, transform 0.8s ease;
+  z-index: 15;
 }
 
 .resurface-button {
-  background: rgba(4, 20, 40, 0.5);
+  background: rgba(4, 20, 40, 0.6);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(100, 200, 255, 0.3);
+  border: 1px solid rgba(100, 200, 255, 0.35);
   border-radius: 30px;
-  padding: 0.75rem 1.6rem;
+  padding: 0.8rem 1.8rem;
   color: #aae0ff;
   font-family: 'Outfit', sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
+  touch-action: manipulation;
 }
 
 .resurface-button svg {
-  width: 1rem;
-  height: 1rem;
+  width: 1.1rem;
+  height: 1.1rem;
   stroke: #66ccff;
   transition: transform 0.3s ease;
 }
 
 .resurface-button:hover {
-  background: rgba(10, 35, 65, 0.75);
-  border-color: rgba(120, 220, 255, 0.6);
+  background: rgba(10, 35, 65, 0.85);
+  border-color: rgba(120, 220, 255, 0.7);
   color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 150, 255, 0.2);
+  box-shadow: 0 6px 24px rgba(0, 150, 255, 0.3);
 }
 
 .resurface-button:hover svg {
@@ -290,7 +295,7 @@ html, body {
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .ui-overlay {
-    padding: 3rem 1.5rem 3.5rem;
+    padding: 3rem 1.2rem 3.5rem;
   }
   
   .dive-button {
@@ -303,12 +308,18 @@ html, body {
   }
   
   .depth-hud {
-    left: 1.5rem;
-    bottom: 1.5rem;
+    left: 1.2rem;
+    top: 1.2rem;
+    padding: 0.6rem 1rem;
   }
-  
+
   .resurface-container {
-    right: 1.5rem;
-    bottom: 1.5rem;
+    right: 1.2rem;
+    bottom: 1.2rem;
+  }
+
+  .resurface-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.75rem;
   }
 }

@@ -184,11 +184,11 @@ export class UnderwaterEnvironment {
     // factor: 0.0 (surface) to 1.0 (deep underwater)
     const fogColor = this.surfaceFogColor.clone().lerp(this.deepFogColor, factor);
     this.scene.fog.color.copy(fogColor);
-    this.scene.fog.density = 0.022 + factor * 0.018;
+    this.scene.fog.density = 0.012 + factor * 0.012;
 
-    // Fade god rays intensity with depth
+    // Fade god rays intensity with depth but keep background rays atmospheric
     if (this.godRayMaterial) {
-      this.godRayMaterial.uniforms.uIntensity.value = Math.max(0.0, 0.65 - factor * 0.55);
+      this.godRayMaterial.uniforms.uIntensity.value = Math.max(0.2, 0.65 - factor * 0.4);
     }
   }
 }

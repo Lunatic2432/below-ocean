@@ -6,6 +6,7 @@ import { UnderwaterEnvironment } from './scene/UnderwaterEnvironment.js';
 import { BubbleSystem } from './scene/BubbleSystem.js';
 import { DiveController } from './scene/DiveController.js';
 import { UIManager } from './ui/UIManager.js';
+import { Scene2 } from './scenes/Scene2/Scene2.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('webgl-canvas');
@@ -36,17 +37,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const bubbleSystem = new BubbleSystem(sceneManager.scene, sceneManager.camera);
   sceneManager.addUpdatable(bubbleSystem);
 
-  // 7. Initialize UI Manager
+  // 7. Build Scene 2 Underwater Exploration Layer
+  const scene2 = new Scene2(sceneManager);
+  sceneManager.addUpdatable(scene2);
+
+  // 8. Initialize UI Manager
   const uiManager = new UIManager();
 
-  // 8. Build Cinematic Dive Controller
+  // 9. Build Cinematic Dive Controller
   const diveController = new DiveController(
     sceneManager,
     skyEnv,
     oceanSurface,
     underwaterEnv,
     bubbleSystem,
-    uiManager
+    uiManager,
+    scene2
   );
   sceneManager.addUpdatable(diveController);
 
@@ -54,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   uiManager.setDiveCallback(() => diveController.dive());
   uiManager.setResurfaceCallback(() => diveController.resurface());
 
-  // 9. Start Main Render Loop
+  // 10. Start Main Render Loop
   sceneManager.render();
 });
+
