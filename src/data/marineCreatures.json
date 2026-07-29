@@ -1,0 +1,119 @@
+[
+  {
+    "id": "green-sea-turtle",
+    "name": "Green Sea Turtle",
+    "scientificName": "Chelonia mydas",
+    "conservationStatus": "Endangered",
+    "ecologicalRole": "Herbivore and seagrass meadow keeper, helping maintain healthy coastal ecosystems.",
+    "funFacts": [
+      "Green sea turtles can travel thousands of miles to return to the same beaches where they were born.",
+      "Despite their name, their shells are usually brown, while the green comes from the fat under their shell."
+    ],
+    "habitat": "Warm, shallow coastal waters with seagrass beds and coral reefs.",
+    "depthRange": "0 - 30 meters"
+  },
+  {
+    "id": "clownfish",
+    "name": "Clownfish",
+    "scientificName": "Amphiprioninae",
+    "conservationStatus": "Least Concern",
+    "ecologicalRole": "Symbiotic partner with sea anemones and small reef-scale nutrient recycler.",
+    "funFacts": [
+      "Clownfish are immune to the stinging cells of sea anemones thanks to a protective mucus layer.",
+      "All clownfish are born male; the dominant fish in each group becomes female."
+    ],
+    "habitat": "Warm coral reef lagoons and sheltered reef slopes.",
+    "depthRange": "1 - 50 meters"
+  },
+  {
+    "id": "pufferfish",
+    "name": "Pufferfish",
+    "scientificName": "Tetraodontidae",
+    "conservationStatus": "Vulnerable",
+    "ecologicalRole": "Algae and invertebrate grazer, helping control reef growth and nutrient balance.",
+    "funFacts": [
+      "Pufferfish can inflate their bodies with water to appear much larger when threatened.",
+      "Many pufferfish contain tetrodotoxin, a powerful toxin that makes them dangerous to predators."
+    ],
+    "habitat": "Shallow reef flats, seagrass beds, and sandy lagoons.",
+    "depthRange": "2 - 40 meters"
+  },
+  {
+    "id": "octopus",
+    "name": "Octopus",
+    "scientificName": "Octopoda",
+    "conservationStatus": "Varies by species",
+    "ecologicalRole": "Intelligent predator and scavenger that helps maintain balanced reef food webs.",
+    "funFacts": [
+      "Octopuses can change skin texture and color instantly for camouflage and communication.",
+      "They are among the most intelligent invertebrates with excellent problem-solving skills."
+    ],
+    "habitat": "Rocky reef crevices, underwater caves, and coral reef shelters.",
+    "depthRange": "0 - 60 meters"
+  },
+  {
+    "id": "coral-reef",
+    "name": "Coral Reef",
+    "scientificName": "Scleractinia / Anthozoa",
+    "conservationStatus": "Vulnerable",
+    "ecologicalRole": "Foundation habitat provider supporting a quarter of all marine species.",
+    "funFacts": [
+      "Corals are animals that live in symbiosis with photosynthetic algae called zooxanthellae.",
+      "Healthy coral reefs grow only a few centimeters per year but form massive structures over thousands of years."
+    ],
+    "habitat": "Warm, clear, shallow waters of tropical seas.",
+    "depthRange": "0 - 40 meters"
+  },
+  {
+    "id": "jellyfish",
+    "name": "Jellyfish",
+    "scientificName": "Scyphozoa",
+    "conservationStatus": "Least Concern",
+    "ecologicalRole": "Open-water drifter and predator of plankton with a role in nutrient cycling.",
+    "funFacts": [
+      "Jellyfish do not have brains, bones, or hearts, yet many species travel long distances.",
+      "Some jellyfish are bioluminescent and glow in the dark ocean at night."
+    ],
+    "habitat": "Open ocean and coastal waters, often near the surface.",
+    "depthRange": "0 - 200 meters"
+  },
+  {
+    "id": "whale",
+    "name": "Whale",
+    "scientificName": "Cetacea",
+    "conservationStatus": "Varies by species",
+    "ecologicalRole": "Ocean giants that help regulate marine food chains and nutrient cycles.",
+    "funFacts": [
+      "Many whales use low-frequency songs to communicate across vast ocean distances.",
+      "When whales dive and surface, they move nutrients through the water column and support plankton growth."
+    ],
+    "habitat": "Open ocean, from surface waters to deep offshore zones.",
+    "depthRange": "0 - 500 meters"
+  },
+  {
+    "id": "shark",
+    "name": "Shark",
+    "scientificName": "Selachimorpha",
+    "conservationStatus": "Varies by species",
+    "ecologicalRole": "Apex predator that maintains healthy fish populations by removing weak or sick individuals.",
+    "funFacts": [
+      "Sharks have been living in the ocean for more than 400 million years.",
+      "Some sharks can detect a single drop of blood in the water from hundreds of meters away."
+    ],
+    "habitat": "Coastal reefs, open ocean, and deep sea environments.",
+    "depthRange": "0 - 1000 meters"
+  },
+  {
+    "id": "stingray",
+    "name": "Stingray",
+    "scientificName": "Myliobatiformes",
+    "conservationStatus": "Near Threatened",
+    "ecologicalRole": "Bottom-dwelling predator that helps control populations of crustaceans and small fish.",
+    "funFacts": [
+      "Stingrays use electroreceptors on their snouts to locate hidden prey in the sand.",
+      "Their flattened bodies allow them to glide gently along the seafloor."
+    ],
+    "habitat": "Sandy flats, reef edges, and shallow bays.",
+    "depthRange": "0 - 70 meters"
+  }
+]

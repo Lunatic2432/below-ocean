@@ -22,6 +22,22 @@
 
   <!-- Integrated Cinematic UI Overlay -->
   <div id="ui-overlay" class="ui-overlay">
+    <div id="top-controls" class="top-controls">
+      <div class="preset-switcher">
+        <button type="button" data-environment="tropical-day" class="preset-button">Tropical Day</button>
+        <button type="button" data-environment="golden-sunset" class="preset-button">Golden Sunset</button>
+        <button type="button" data-environment="bioluminescent-night" class="preset-button">Bioluminescent Night</button>
+      </div>
+      <div class="tool-buttons">
+        <button id="tour-btn" class="tool-button" type="button">Take a Tour</button>
+        <button id="skip-tour-btn" class="tool-button hidden" type="button">Skip Tour</button>
+        <button id="photo-btn" class="icon-button" type="button" aria-label="Photo Mode">📷</button>
+        <button id="mute-btn" class="icon-button" type="button" aria-label="Mute audio">MUTE</button>
+      </div>
+    </div>
+
+    <div id="tour-title" class="tour-title hidden"></div>
+
     <!-- Header / Title section -->
     <header class="title-container" id="title-container">
       <div class="subtitle-badge">SCENE I &bull; THE SURFACE</div>
@@ -64,6 +80,44 @@
         <span>RETURN TO SURFACE</span>
       </button>
     </div>
+
+    <div id="marine-panel-backdrop" class="marine-panel-backdrop hidden"></div>
+    <aside id="marine-info-panel" class="marine-info-panel hidden" aria-label="Marine Life Encyclopedia Panel">
+      <div class="marine-panel-header">
+        <div>
+          <div class="marine-panel-tag">Marine Life Encyclopedia</div>
+          <h2 id="marine-panel-title" class="marine-panel-heading">Select a creature</h2>
+          <p id="marine-panel-scientific" class="marine-panel-subtitle"></p>
+        </div>
+        <button id="marine-panel-close" class="marine-panel-close" aria-label="Close panel">×</button>
+      </div>
+      <div class="marine-panel-fields">
+        <div class="marine-panel-field">
+          <span>Status</span>
+          <strong id="marine-panel-status"></strong>
+        </div>
+        <div class="marine-panel-field">
+          <span>Ecological Role</span>
+          <p id="marine-panel-role"></p>
+        </div>
+        <div class="marine-panel-field">
+          <span>Habitat</span>
+          <p id="marine-panel-habitat"></p>
+        </div>
+        <div class="marine-panel-field">
+          <span>Depth Range</span>
+          <strong id="marine-panel-depth"></strong>
+        </div>
+        <div class="marine-panel-field">
+          <span>Fun Facts</span>
+          <ul id="marine-panel-facts" class="marine-panel-facts"></ul>
+        </div>
+      </div>
+      <div class="marine-panel-list-group">
+        <div class="marine-panel-list-title">Explore other species</div>
+        <div id="marine-panel-list" class="marine-panel-list"></div>
+      </div>
+    </aside>
   </div>
 
   <script type="module" src="/src/main.js"></script>

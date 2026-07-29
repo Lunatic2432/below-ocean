@@ -42,7 +42,11 @@ export class SkyEnvironment {
     const skyMat = new THREE.ShaderMaterial({
       side: THREE.BackSide,
       uniforms: {
-        uSunPosition: { value: this.sunPosition.clone().normalize() }
+        uSunPosition: { value: this.sunPosition.clone().normalize() },
+        uZenithColor: { value: new THREE.Color(0x080828) },
+        uMidColor: { value: new THREE.Color(0x682f41) },
+        uHorizonColor: { value: new THREE.Color(0xf08b37) },
+        uSunGlowColor: { value: new THREE.Color(0xffd380) }
       },
       vertexShader: `
         varying vec3 vWorldPosition;
@@ -55,29 +59,24 @@ export class SkyEnvironment {
       fragmentShader: `
         varying vec3 vWorldPosition;
         uniform vec3 uSunPosition;
+        uniform vec3 uZenithColor;
+        uniform vec3 uMidColor;
+        uniform vec3 uHorizonColor;
+        uniform vec3 uSunGlowColor;
 
         void main() {
           vec3 viewDir = normalize(vWorldPosition);
           float height = viewDir.y;
 
-          // Sunset Gradient Sky Colors
-          vec3 zenithColor  = vec3(0.08, 0.08, 0.28);   // Deep dusk purple top
-          vec3 midColor     = vec3(0.68, 0.25, 0.45);   // Soft rose / pink mid sky
-          vec3 horizonColor = vec3(0.98, 0.52, 0.22);   // Warm sunset orange horizon
-          vec3 sunGlowColor = vec3(1.0, 0.85, 0.45);    // Golden yellow sun glow
+          vec3 skyColor = mix(uHorizonColor, uMidColor, smoothstep(0.0, 0.35, height));
+          skyColor = mix(skyColor, uZenithColor, smoothstep(0.35, 1.0, height));
 
-          // Gradient interpolation across sky height
-          vec3 skyColor = mix(horizonColor, midColor, smoothstep(0.0, 0.35, height));
-          skyColor = mix(skyColor, zenithColor, smoothstep(0.35, 1.0, height));
-
-          // Sun atmospheric scattering glow
           float sunDot = max(0.0, dot(viewDir, uSunPosition));
           float sunGlow = pow(sunDot, 12.0) * 0.9 + pow(sunDot, 96.0) * 1.8;
-          skyColor += sunGlowColor * sunGlow;
+          skyColor += uSunGlowColor * sunGlow;
 
-          // Fade out below horizon into deep ocean base
           if (height < 0.0) {
-            skyColor = mix(horizonColor * 0.4, vec3(0.01, 0.05, 0.12), clamp(-height * 5.0, 0.0, 1.0));
+            skyColor = mix(uHorizonColor * 0.4, vec3(0.01, 0.05, 0.12), clamp(-height * 5.0, 0.0, 1.0));
           }
 
           gl_FragColor = vec4(skyColor, 1.0);

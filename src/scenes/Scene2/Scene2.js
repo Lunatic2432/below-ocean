@@ -17,6 +17,7 @@ export class Scene2 {
     this.sequenceTimer = 0;
     this.sequenceTargetPos = new THREE.Vector3();
     this.sequenceGetDynamicPos = null;
+    this.onCreatureClickCallback = null;
 
     // 3D Physics Movement & Orientation State
     this.velocity = new THREE.Vector3();
@@ -281,24 +282,35 @@ export class Scene2 {
 
         console.log(`[CLICK PIPELINE] Interactive root found: ${registeredType}. Executing callback...`);
 
-        if (data.isFishSchool && this.layer1.fishSchools) {
-          this.layer1.fishSchools.onClickSchool(data.schoolIndex, intersects[0].point);
-        } else if (data.isSeaTurtle && this.layer1.seaTurtle) {
-          this.layer1.seaTurtle.onClickTurtle((targetPos, duration, dynamicFn) => {
-            this.triggerTemporarySequence(targetPos, duration, dynamicFn);
-          });
-        } else if (data.isOctopus && this.layer1.octopus) {
-          this.layer1.octopus.onClickOctopus();
-        } else if (data.isPufferfish && this.layer1.pufferfish) {
-          this.layer1.pufferfish.onClickPufferfish();
+        let creatureId = null;
+
+        if (data.isFishSchool) {
+          creatureId = 'clownfish';
+          if (this.layer1.fishSchools) this.layer1.fishSchools.onClickSchool(data.schoolIndex, intersects[0].point);
+        } else if (data.isSeaTurtle) {
+          creatureId = 'green-sea-turtle';
+          if (this.layer1.seaTurtle) {
+            this.layer1.seaTurtle.onClickTurtle((targetPos, duration, dynamicFn) => {
+              this.triggerTemporarySequence(targetPos, duration, dynamicFn);
+            });
+          }
+        } else if (data.isOctopus) {
+          creatureId = 'octopus';
+          if (this.layer1.octopus) this.layer1.octopus.onClickOctopus();
+        } else if (data.isPufferfish) {
+          creatureId = 'pufferfish';
+          if (this.layer1.pufferfish) this.layer1.pufferfish.onClickPufferfish();
         } else if (data.isCrab && this.layer1.crabs) {
-          this.layer1.crabs.onClickCrab(data.crabIndex);
-        } else if (data.isDolphin && this.layer1.dolphinShadow) {
-          this.layer1.dolphinShadow.onClickDolphin();
+          if (this.layer1.crabs) this.layer1.crabs.onClickCrab(data.crabIndex);
         } else if (data.interactiveType === 'coral' && this.layer1.coralReefs) {
+          creatureId = 'coral-reef';
           this.layer1.coralReefs.onClickCoral(data.meshRef || hitObj);
         } else if (data.interactiveType === 'bubbleVent' && this.layer1.bubbles) {
           this.layer1.bubbles.onClickVent(data.ventIndex);
+        }
+
+        if (creatureId && typeof this.onCreatureClickCallback === 'function') {
+          this.onCreatureClickCallback(creatureId);
         }
       } else {
         console.log(`[CLICK PIPELINE] No interactive parent found for mesh '${hitObj.name || hitObj.type}'`);
@@ -316,6 +328,10 @@ export class Scene2 {
     this.sequenceTimer = duration;
     this.sequenceTargetPos.copy(targetPos);
     this.sequenceGetDynamicPos = getDynamicFn;
+  }
+
+  setCreatureClickCallback(cb) {
+    this.onCreatureClickCallback = cb;
   }
 
   activate() {

@@ -7,6 +7,11 @@ import { BubbleSystem } from './scene/BubbleSystem.js';
 import { DiveController } from './scene/DiveController.js';
 import { UIManager } from './ui/UIManager.js';
 import { Scene2 } from './scenes/Scene2/Scene2.js';
+import { MarineInfoPanel } from './ui/MarineInfoPanel.js';
+import { EnvironmentPresetManager } from './scene/EnvironmentPresetManager.js';
+import { TourManager } from './scene/TourManager.js';
+import { AudioManager } from './ui/AudioManager.js';
+import { PhotoMode } from './ui/PhotoMode.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('webgl-canvas');
@@ -44,6 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // 8. Initialize UI Manager
   const uiManager = new UIManager();
 
+  // 8.5 Build Encyclopedia Panel and Audio
+  const marineInfoPanel = new MarineInfoPanel();
+  const audioManager = new AudioManager();
+  const photoMode = new PhotoMode(sceneManager.renderer, uiManager);
+  uiManager.setMuteButtonState(audioManager.isMuted);
+
   // 9. Build Cinematic Dive Controller
   const diveController = new DiveController(
     sceneManager,
@@ -56,11 +67,39 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   sceneManager.addUpdatable(diveController);
 
+  // 10. Build Environment Presets
+  const presetManager = new EnvironmentPresetManager(
+    sceneManager.scene,
+    skyEnv,
+    underwaterEnv,
+    oceanSurface,
+    scene2.layer1
+  );
+  sceneManager.addUpdatable(presetManager);
+
+  // 11. Build Tour Manager
+  const tourManager = new TourManager(sceneManager, scene2, uiManager);
+  sceneManager.addUpdatable(tourManager);
+
+  // 12. Register Creature click panel and audio interactions
+  scene2.setCreatureClickCallback((creatureId) => {
+    marineInfoPanel.open(creatureId);
+    audioManager.playBubbleSound();
+  });
+
+  uiManager.setEnvironmentChangeCallback((mode) => {
+    presetManager.setPreset(mode);
+  });
+  uiManager.setTourCallback(() => tourManager.startTour());
+  uiManager.setSkipTourCallback(() => tourManager.skipTour());
+  uiManager.setPhotoCallback(() => photoMode.capture());
+  uiManager.setMuteToggleCallback(() => audioManager.toggleMute());
+
   // Bind UI buttons to Dive Controller actions
   uiManager.setDiveCallback(() => diveController.dive());
   uiManager.setResurfaceCallback(() => diveController.resurface());
 
-  // 10. Start Main Render Loop
+  // 13. Start Main Render Loop
   sceneManager.render();
 });
 
