@@ -6,14 +6,19 @@ export class SeaTurtle {
     this.scene = scene;
     this.group = new THREE.Group();
     this.raycastTargets = [];
+    this.mixer = null;
 
-    this.group.position.set(12, -18, -10);
+    this.group.position.set(0, -17.5, -5);
     this.scene.add(this.group);
 
     this.isTrackingCamera = false;
     this.trackTimer = 0;
 
+    // Procedural turtle initial fallback
     this.buildProceduralTurtle();
+
+    // Load animated GLB sea turtle model
+    this.loadGLBModel();
   }
 
   buildProceduralTurtle() {
@@ -84,56 +89,112 @@ export class SeaTurtle {
     }
   }
 
-  loadGLBModel(glbPath, position, scale = 1.0) {
-    const loader = new GLTFLoader();
-    loader.load(
-      glbPath,
-      (gltf) => {
-        this.group.remove(this.turtleGroup);
-        this.turtleGroup = gltf.scene;
-        if (position) this.group.position.copy(position);
-        this.turtleGroup.scale.setScalar(scale);
-        this.group.add(this.turtleGroup);
+  loadGLBModel(glbPath = null, position = null, scale = 1.2) {
+    const candidatePaths = glbPath
+      ? [glbPath]
+      : [
+          '/assests/models/sea turtle simple.glb',
+          './assests/models/sea turtle simple.glb',
+          'assests/models/sea turtle simple.glb',
+          '/assests/models/sea%20turtle%20simple.glb',
+          '/assets/models/sea turtle simple.glb'
+        ];
 
-        this.raycastTargets = [];
-        this.turtleGroup.traverse((child) => {
-          if (child.isMesh) {
-            child.userData = { isSeaTurtle: true };
-            this.raycastTargets.push(child);
+    const loader = new GLTFLoader();
+    let loaded = false;
+
+    const tryNext = (index) => {
+      if (index >= candidatePaths.length || loaded) return;
+      loader.load(
+        candidatePaths[index],
+        (gltf) => {
+          loaded = true;
+          console.log(`[SeaTurtle] Successfully loaded GLB model from ${candidatePaths[index]}`);
+
+          if (this.turtleGroup) {
+            this.group.remove(this.turtleGroup);
           }
-        });
-      },
-      undefined,
-      (error) => {
-        console.warn(`[SeaTurtle] Optional GLB ${glbPath} not loaded:`, error);
-      }
-    );
+          this.turtleGroup = gltf.scene;
+
+          if (position) this.group.position.copy(position);
+          this.turtleGroup.scale.setScalar(scale);
+          this.turtleGroup.rotation.y = Math.PI; // Face direction of travel
+          this.group.add(this.turtleGroup);
+
+          // Setup AnimationMixer for continuous GLB flipper swimming animation
+          if (gltf.animations && gltf.animations.length > 0) {
+            this.mixer = new THREE.AnimationMixer(this.turtleGroup);
+            gltf.animations.forEach((clip) => {
+              const action = this.mixer.clipAction(clip);
+              action.play();
+              action.setEffectiveTimeScale(0.75); // Realistic gentle swimming stroke speed
+            });
+          }
+
+          this.raycastTargets = [];
+          this.turtleGroup.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              child.userData = { isSeaTurtle: true };
+              this.raycastTargets.push(child);
+            }
+          });
+        },
+        undefined,
+        (error) => {
+          console.warn(`[SeaTurtle] GLB load attempt for path ${candidatePaths[index]} failed:`, error);
+          tryNext(index + 1);
+        }
+      );
+    };
+    tryNext(0);
   }
 
   update(elapsedTime, deltaTime) {
-    let swimSpeed = 1.5;
+    // 1. Update GLB swimming flippers animation mixer
+    if (this.mixer) {
+      this.mixer.update(deltaTime);
+    }
+
+    // 2. Camera follow sequence tracking speed modifier
+    let speedMult = 1.0;
     if (this.isTrackingCamera) {
-      swimSpeed = 3.0;
+      speedMult = 1.6;
       this.trackTimer -= deltaTime;
       if (this.trackTimer <= 0) {
         this.isTrackingCamera = false;
       }
     }
 
-    const angle = elapsedTime * 0.25;
-    this.group.position.x = 12 + Math.cos(angle) * 8;
-    this.group.position.z = -10 + Math.sin(angle) * 6;
-    this.group.position.y = -18 + Math.sin(elapsedTime * 0.8) * 0.6;
+    // 3. Gentle circular swimming path around the seabed coral reef
+    const angle = elapsedTime * 0.12 * speedMult;
+    const radiusX = 16.0;
+    const radiusZ = 13.0;
+    const centerZ = -5.0;
+    const centerY = -17.5;
 
-    const nextPos = new THREE.Vector3(
-      12 + Math.cos(angle + 0.05) * 8,
-      -18 + Math.sin((elapsedTime + 0.05) * 0.8) * 0.6,
-      -10 + Math.sin(angle + 0.05) * 6
-    );
+    const posX = Math.cos(angle) * radiusX;
+    const posZ = centerZ + Math.sin(angle) * radiusZ;
+    const posY = centerY + Math.sin(elapsedTime * 0.5) * 0.7;
+
+    this.group.position.set(posX, posY, posZ);
+
+    // Compute lookAt target point slightly ahead along the circular path
+    const futureAngle = angle + 0.04;
+    const futureX = Math.cos(futureAngle) * radiusX;
+    const futureZ = centerZ + Math.sin(futureAngle) * radiusZ;
+    const futureY = centerY + Math.sin((elapsedTime + 0.04) * 0.5) * 0.7;
+
+    const nextPos = new THREE.Vector3(futureX, futureY, futureZ);
     this.group.lookAt(nextPos);
 
-    const paddle = Math.sin(elapsedTime * 3.5) * 0.35;
-    if (this.leftFlipper) this.leftFlipper.rotation.z = paddle;
-    if (this.rightFlipper) this.rightFlipper.rotation.z = -paddle;
+    // Procedural flipper animation fallback if GLB mixer absent
+    if (!this.mixer) {
+      const paddle = Math.sin(elapsedTime * 3.5) * 0.35;
+      if (this.leftFlipper) this.leftFlipper.rotation.z = paddle;
+      if (this.rightFlipper) this.rightFlipper.rotation.z = -paddle;
+    }
   }
 }
+

@@ -8,14 +8,23 @@ export class CoralReefs {
     this.swayObjects = [];
     this.raycastTargets = [];
     this.releasedFish = [];
+    this.mixers = [];
+    this.coralInstances = [];
 
+    // Seabed group position
     this.group.position.set(0, -22, -5);
     this.scene.add(this.group);
 
+    // Initial procedural reefs as fallback
     this.buildProceduralReefs();
+
+    // Load realistic GLB Coral Reefs
+    this.loadGLBCoralReefs();
   }
 
   buildProceduralReefs() {
+    this.proceduralGroup = new THREE.Group();
+
     // 1. Brain Coral
     const brainMat = new THREE.MeshStandardMaterial({
       color: 0xe85d75,
@@ -47,7 +56,7 @@ export class CoralReefs {
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       mesh.userData = { interactiveType: 'coral', coralIndex: idx, meshRef: mesh };
-      this.group.add(mesh);
+      this.proceduralGroup.add(mesh);
       this.raycastTargets.push(mesh);
     });
 
@@ -81,7 +90,7 @@ export class CoralReefs {
         this.raycastTargets.push(branchMesh);
       }
 
-      this.group.add(coralCluster);
+      this.proceduralGroup.add(coralCluster);
       this.swayObjects.push({ group: coralCluster, speed: 0.8, factor: 0.05 });
     });
 
@@ -116,11 +125,120 @@ export class CoralReefs {
       fanMesh.rotation.y = f.rotY;
       fanMesh.castShadow = true;
       fanMesh.userData = { interactiveType: 'coral', meshRef: fanMesh };
-      this.group.add(fanMesh);
+      this.proceduralGroup.add(fanMesh);
       this.raycastTargets.push(fanMesh);
 
       this.swayObjects.push({ group: fanMesh, speed: 1.2, factor: 0.08 });
     });
+
+    this.group.add(this.proceduralGroup);
+  }
+
+  loadGLBCoralReefs() {
+    const candidatePaths = [
+      '/assests/models/coralreef1.glb',
+      './assests/models/coralreef1.glb',
+      'assests/models/coralreef1.glb',
+      '/assets/models/coralreef1.glb'
+    ];
+
+    const loader = new GLTFLoader();
+    let loaded = false;
+
+    const tryNext = (index) => {
+      if (index >= candidatePaths.length || loaded) return;
+
+      loader.load(
+        candidatePaths[index],
+        (gltf) => {
+          loaded = true;
+          console.log(`[CoralReefs] Successfully loaded GLB model from ${candidatePaths[index]}`);
+
+          // Remove initial procedural fallback reefs
+          if (this.proceduralGroup) {
+            this.group.remove(this.proceduralGroup);
+            this.proceduralGroup = null;
+          }
+
+          // Clear existing procedural targets
+          this.raycastTargets = [];
+          this.swayObjects = [];
+          this.coralInstances = [];
+
+          // Natural cluster placement positions across the seabed floor
+          const reefPositions = [
+            { x: 0, z: -5, baseScale: 3.5 },
+            { x: -10, z: -5, baseScale: 2.8 },
+            { x: 12, z: -8, baseScale: 3.2 },
+            { x: -6, z: -15, baseScale: 3.0 },
+            { x: 8, z: -14, baseScale: 2.7 },
+            { x: -16, z: -10, baseScale: 3.4 },
+            { x: 18, z: -6, baseScale: 2.9 },
+            { x: -2, z: -20, baseScale: 3.6 },
+            { x: 14, z: -18, baseScale: 3.1 },
+            { x: -8, z: 4, baseScale: 2.5 },
+            { x: 6, z: 3, baseScale: 2.6 },
+            { x: -14, z: 6, baseScale: 3.0 },
+            { x: 15, z: 5, baseScale: 2.8 },
+            { x: -22, z: -12, baseScale: 3.3 },
+            { x: 22, z: -12, baseScale: 3.2 }
+          ];
+
+          reefPositions.forEach((p) => {
+            const coralModel = gltf.scene.clone(true);
+
+            // Randomize Y rotation and subtle X/Z tilts for organic variation
+            const rotY = Math.random() * Math.PI * 2;
+            const rotX = (Math.random() - 0.5) * 0.15;
+            const rotZ = (Math.random() - 0.5) * 0.15;
+            const scale = p.baseScale * (0.75 + Math.random() * 0.5);
+
+            coralModel.position.set(p.x, 0, p.z);
+            coralModel.rotation.set(rotX, rotY, rotZ);
+            coralModel.scale.setScalar(scale);
+
+            // Enable shadows, clone material for distinct glowing state, and register raycast targets
+            coralModel.traverse((child) => {
+              if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                if (child.material) {
+                  child.material = child.material.clone();
+                }
+                child.userData = { interactiveType: 'coral', meshRef: child };
+                this.raycastTargets.push(child);
+              }
+            });
+
+            this.group.add(coralModel);
+
+            // Track instance for current-driven swaying animations
+            this.coralInstances.push({
+              model: coralModel,
+              baseRotX: rotX,
+              baseRotZ: rotZ,
+              swaySpeed: 0.6 + Math.random() * 0.6,
+              swayFactor: 0.02 + Math.random() * 0.025,
+              phase: Math.random() * Math.PI * 2
+            });
+
+            // If GLB contains embedded animation clips, set up AnimationMixer
+            if (gltf.animations && gltf.animations.length > 0) {
+              const mixer = new THREE.AnimationMixer(coralModel);
+              gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+              this.mixers.push(mixer);
+            }
+          });
+        },
+        undefined,
+        (error) => {
+          console.warn(`[CoralReefs] GLB load attempt for path ${candidatePaths[index]} failed:`, error);
+          tryNext(index + 1);
+        }
+      );
+    };
+
+    tryNext(0);
   }
 
   /**
@@ -177,14 +295,25 @@ export class CoralReefs {
   }
 
   update(elapsedTime, deltaTime, cameraPos = null) {
-    // Current-based swaying for branching corals, sea fans, and anemones
+    // 1. Update GLB animation mixers if present
+    this.mixers.forEach((mixer) => mixer.update(deltaTime));
+
+    // 2. Realistic current-based swaying for animated coral instances
+    this.coralInstances.forEach((item) => {
+      const swayZ = Math.sin(elapsedTime * item.swaySpeed + item.phase) * item.swayFactor;
+      const swayX = Math.cos(elapsedTime * item.swaySpeed * 0.8 + item.phase) * (item.swayFactor * 0.6);
+      item.model.rotation.z = item.baseRotZ + swayZ;
+      item.model.rotation.x = item.baseRotX + swayX;
+    });
+
+    // Swaying for procedural sway objects (if any active)
     this.swayObjects.forEach((item, index) => {
       const sway = Math.sin(elapsedTime * item.speed + index) * item.factor;
       item.group.rotation.z = sway;
       item.group.rotation.x = Math.cos(elapsedTime * item.speed * 0.7 + index) * (item.factor * 0.5);
     });
 
-    // Proximity atmospheric bioluminescent glow & click pulse handling
+    // 3. Proximity atmospheric bioluminescent glow & click pulse handling
     if (this.raycastTargets) {
       const coralWorldPos = new THREE.Vector3();
       this.raycastTargets.forEach((mesh) => {
@@ -218,7 +347,7 @@ export class CoralReefs {
       });
     }
 
-    // Update released fish swimming away
+    // 4. Update released fish swimming away
     for (let i = this.releasedFish.length - 1; i >= 0; i--) {
       const rf = this.releasedFish[i];
       rf.mesh.position.addScaledVector(rf.velocity, deltaTime);
@@ -232,3 +361,4 @@ export class CoralReefs {
     }
   }
 }
+
